@@ -4,7 +4,7 @@ Spring:
   datasource:
     url: jdbc:mysql://localhost:3306/bs?characterEncoding=UTF-8&serverTimezone=UTC
     username: root
-    password: zheng123
+    password: 
   jpa:
     hibernate:
       ddl-auto: update
