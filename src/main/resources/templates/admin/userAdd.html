@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>管理员</title>
+<link rel="stylesheet" href="/css/layui.css">
+<link rel="stylesheet" href="/css/global.css">
+<style type="text/css">
+.layui-form-item .layui-input-inline {
+	width: 300px;
+}
+
+.layui-layout-admin .layui-logo {
+	color: white;
+	font-size: 20px;
+}
+.error{
+	color:red;
+}
+.layui-form-item span{
+	height: 45px;
+	line-height: 45px;
+}
+</style>
+</head>
+<body>
+	<div class="row">
+		<form class="layui-form layui-form-pane" action="">
+			<div class="layui-form-item">
+				<label class="layui-form-label">用户名</label>
+				<div class="layui-input-inline">
+					<input type="text" name="username" lay-verify="username" id="username"
+						placeholder="请输入用户名" autocomplete="off" class="layui-input">
+				</div>
+				<span style="color: #393D49">用户名6-12，不能有空格</span>
+			</div>
+			<div class="layui-form-item">
+				<label class="layui-form-label">昵称</label>
+				<div class="layui-input-inline">
+					<input type="text" name="usernickname" lay-verify="usernickname"
+						placeholder="请输入昵称" autocomplete="off" class="layui-input">
+				</div>
+				<span style="color: #393D49">昵称3-12，不能有特殊字符</span>
+			</div>
+			<div class="layui-form-item">
+				<label class="layui-form-label">密码</label>
+				<div class="layui-input-inline">
+					<input type="password" name="userpass" lay-verify="userpass" id="userpass"
+						placeholder="请输入密码" autocomplete="off" class="layui-input">
+				</div>
+				<span style="color: #393D49">密码必须6到12位，且不能出现空格</span>
+			</div>
+			<div class="layui-form-item">
+				<label class="layui-form-label">确认密码</label>
+				<div class="layui-input-inline">
+					<input type="password" name="repassword" lay-verify="repassword" id="repassword"
+						placeholder="重复输入密码" autocomplete="off" class="layui-input">
+				</div>
+			</div>
+			 <div class="layui-form-item">
+			    <div class="layui-input-block">
+			      <button class="layui-btn" lay-submit="" lay-filter="addForm">立即提交</button>
+			      <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+			    </div>
+			  </div>
+		</form>
+	</div>
+	<script src="/layui.js"></script>
+	<script type="text/javascript">
+		layui.use('element', function() {
+			var $ = layui.jquery;
+			var element = layui.element;
+		});
+		//表单验证
+		layui.use('form', function() {
+			var form = layui.form;
+			var $=layui.jquery
+			form.verify({
+				username: function(value, item){ //value：表单的值、item：表单的DOM对象
+				    if(!new RegExp("^[a-zA-Z0-9_\u4e00-\u9fa5\\s·]+$").test(value)){
+				      return '用户名不能有特殊字符';
+				    }
+				    if(/(^\_)|(\__)|(\_+$)/.test(value)){
+				      return '用户名首尾不能出现下划线\'_\'';
+				    }
+				    if(value.length < 6 || value.length > 12){
+				    	return '用户名必须6到12位，且不能出现空格';
+				    }
+				  }
+				  ,usernickname: function(value, item){ //value：表单的值、item：表单的DOM对象
+				    if(!new RegExp("^[a-zA-Z0-9_\u4e00-\u9fa5\\s·]+$").test(value)){
+				      return '昵称不能有特殊字符';
+				    }
+				    if(/(^\_)|(\__)|(\_+$)/.test(value)){
+				      return '昵称首尾不能出现下划线\'_\'';
+				    }
+				    if(value.length < 3 || value.length > 12){
+				    	return '昵称必须3到12位，且不能出现空格';
+				    }
+				  }
+				  ,userpass: [
+				    /^[\S]{6,12}$/
+				    ,'密码必须6到12位，且不能出现空格'
+				  ] 
+				  ,repassword: function(value) {
+					//获取密码
+					var pass = $("#userpass").val();
+					if(pass != value) {
+						return '两次输入的密码不一致';
+					}
+				}
+			});
+			//监听提交
+			form.on('submit(addForm)', function(data) {
+				 $.ajax({
+		             type: "POST",
+		             url: "/admin/userAddOne",
+		             data:{
+		            	 username:data.field['username'],
+		            	 usernickname:data.field['usernickname'],
+		            	 userpass:data.field['userpass']
+		             },
+		             success: function(data){
+		            	 	layer.msg(data, {time: 1000}, function () {
+		                     //重新加载当前页面
+		                    location.reload();
+		                 });
+		             }
+		         });
+				return false;
+			});
+			//用户唯一判断
+			$("#username").blur(function(){
+				var username = $("#username").val();
+				$.ajax({
+		             type: "POST",
+		             url: "/admin/userCheckOne",
+		             data:{
+		            	 username:username,
+		             },
+		             success: function(data){
+		            	 	if(data == 'yes'){
+		            	 		layer.alert("该用户已存在！")
+		            	 		$("#username").val("");
+		            	 		$("#username").focus();
+		            	 	}
+		             }
+		         });
+			});
+		})
+	</script>
+</body>
+</html>

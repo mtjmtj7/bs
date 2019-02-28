@@ -1,0 +1,75 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>登录到后台</title>
+<link rel="stylesheet" href="css/login.css">
+<link rel="stylesheet" href="css/bootstrap.min.css">
+</head>
+<body>
+<!-- begin -->
+<div id="login">
+    <div class="wrapper">
+        <div class="login">
+            <form action="login" method="post" class="container offset1 loginform">
+            	<!--
+                	时间：2017-07-08
+                	描述：动画效果
+                -->
+                <div id="owl-login">
+                    <div class="hand"></div>
+                    <div class="hand hand-r"></div>
+                    <div class="arms">
+                        <div class="arm"></div>
+                        <div class="arm arm-r"></div>
+                    </div>
+                </div>
+                
+                <div class="pad">
+                    <div class="control-group">
+                        <div class="controls">
+                            <label for="email" class="control-label fa fa-envelope"></label>
+                            <input id="email" type="text" name="username" placeholder="请输入用户名" tabindex="1" autofocus="autofocus"
+                             class="form-control input-medium" th:value="${user}?${user.getUsername()}:''">
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <div class="controls">
+                            <label for="password" class="control-label fa fa-asterisk"></label>
+                            <input id="password" type="password" name="userpass" placeholder="请输入密码" tabindex="2" class="form-control input-medium">
+                        </div>
+                    </div>
+                    <!-- 用户类型 -->
+                   <div class="control-group">
+                        <div class="controls">
+                        	<select class="form-control input-medium" name="usertype">
+                        		<option value="1">普通用户</option>
+                        		<option value="0">管理员</option>
+                        	</select>
+                        </div>
+                    </div>
+                   <div class="control-group" th:if="${message}">
+                        <span class="text-danger" th:text="${message}"></span>
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" tabindex="4" class="btn btn-primary">登录</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <script src="js/jquery.min.js"></script>
+    <script>
+    $(function() {
+
+        $('#login #password').focus(function() {
+            $('#owl-login').addClass('password');
+        }).blur(function() {
+            $('#owl-login').removeClass('password');
+        });
+    });
+    </script>
+</div>
+<!-- end -->
+</body>
+</html>

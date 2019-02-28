@@ -1,0 +1,17 @@
+<div class="layui-header header header-doc" th:fragment="nav(userNow)">
+	<div class="layui-main layui-layout  layui-layout-admin">
+		<div class="layui-logo">家庭收支管理系统</div>
+		<ul class="layui-nav"  style="text-align: right;">
+		  <li class="layui-nav-item">
+		    <a href="/user/index">个人中心</a>
+		  </li>
+			<li class="layui-nav-item">
+			    <a href=""><img th:src="'/img/'+${session.userNow.getUserimg()}" class="layui-nav-img" th:text="${session.userNow.getUsernickname()}"></a>
+			    <dl class="layui-nav-child">
+			      <dd><a th:href="'/user/update/'+${session.userNow.getUid()}">修改信息</a></dd>
+			      <dd><a href="/logout">退出</a></dd>
+			    </dl>
+			</li>
+		</ul>
+	</div>
+</div>

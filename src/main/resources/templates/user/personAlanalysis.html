@@ -1,0 +1,252 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>年度账单</title>
+<link rel="stylesheet" href="/css/layui.css">
+<link rel="stylesheet" href="/css/global.css">
+
+<style type="text/css">
+body {
+	background-color: #F0F0F0;
+}
+
+.layui-form-item .layui-input-inline {
+	width: 300px;
+}
+
+.layui-layout-admin .layui-logo {
+	color: white;
+	font-size: 20px;
+}
+
+.layui-form-select dl dd.layui-this {
+	background-color: #009688 !important;
+}
+
+.txt-small {
+	color: #2F4056;
+}
+
+.txt-big3 {
+	font-weight:bold;
+	font-size: 18px;
+}
+
+.txt-big2 {
+	font-size: 14px;
+}
+
+.txt-big1 {
+	font-size: 12px;
+}
+
+.money {
+	font-style: italic;
+	color: #FF5722;
+	font-size: 16px;
+}
+.layui-row{
+	width: 720px;
+	margin: 0px auto;
+}
+</style>
+<!-- 引入 echarts.js -->
+<script src="/js/echarts.common.min.js"></script>
+<script src="/js/shine.js"></script>
+</head>
+<body>
+	<div class="layui-header header header-doc"
+		th:include="user/nav :: nav(userNow=${session.userNow.getUsername()}==null?null:${session.userNow.getUsername()})"></div>
+	<div class="layui-container">
+		<div class="layui-row" style="margin-top: 30px;">
+				<span class="txt-big3">全年总支出：</span><span class="txt-small money"
+					th:text="${allPayOutMoney}"></span>&nbsp;¥
+				<hr class="layui-bg-green">
+				<div id="payOutMoney" style="height: 300px;"></div>
+				<hr class="layui-bg-green">
+				<!-- 支出分类占比 -->
+				<div id="payOutCatalog" style="height: 300px;"></div>
+				<hr class="layui-bg-red">
+				<em class="txt-big3" style="margin-top: 30px;">全年总收入：</em><span class="txt-small money"
+					th:text="${allPayInMoney}"></span>&nbsp;¥
+				<hr class="layui-bg-red">
+				<!-- 收入 -->
+				<div id="payInMoney" style="height: 300px;"></div>
+				<hr class="layui-bg-green">
+				<!-- 收入分类占比 -->
+				<div id="payInCatalog" style="height: 300px;"></div>
+				<hr class="layui-bg-red">
+		</div>
+	</div>
+</body>
+<script src="/layui.js"></script>
+<script type="text/javascript" th:inline="javascript">
+		layui.use(['element','form','layer'], function() {
+			var $ = layui.jquery;
+			var element = layui.element;
+			var form = layui.form;
+			var layer = layui.layer;
+			
+			var months = [ '1月', '2月', '3月', '4月', '5月', '6月', '7月' , '8月', '9月', '10月', '11月', '12月'];
+			var dom = document.getElementById("payOutMoney");
+			var myChart = echarts.init(dom);
+			var app = {};
+			
+			var allPayOutData = [[${everyMonthPayOutMoneyList}]];
+			option = null;
+			option = {
+				xAxis : {
+					type : 'category',
+					data : months
+				},
+				yAxis : {
+					type : 'value'
+				},
+				series : [ {
+					data : allPayOutData,
+					type : 'bar',
+			        itemStyle: {
+			            color: '#009688'
+			        },
+			        label: {
+			            show: true,
+			        },
+	
+			        emphasis: {
+			            label: {
+			                show: true,
+			            }
+			        }
+				} ]
+			};
+			;
+			if (option && typeof option === "object") {
+				myChart.setOption(option, true);
+			}
+			//支出分类占比
+			var outTypeCatalog = [[${outTypeCatalog}]];
+			var payOutMapByCatalog = [[${payOutMapByCatalog}]];
+			var pMap = [];
+			for(var key in payOutMapByCatalog){
+				pMap.push({value:payOutMapByCatalog[key], name:key});
+			}
+			var dom2 = document.getElementById("payOutCatalog");
+			var myChart2 = echarts.init(dom2);
+			option2 = {
+				    title : {
+				        text: '支出分类占比',
+				        x:'center'
+				    },
+				    tooltip : {
+				        trigger: 'item',
+				        formatter: "{a} <br/>{b} : {c} ({d}%)"
+				    },
+				    legend: {
+				        orient: 'vertical',
+				        left: 'left',
+				        data:  outTypeCatalog
+				    },
+				    series : [
+				        {
+				            name: '支出占比',
+				            type: 'pie',
+				            radius : '55%',
+				            center: ['50%', '60%'],
+				            data: pMap,
+				            itemStyle: {
+				                emphasis: {
+				                    shadowBlur: 10,
+				                    shadowOffsetX: 0,
+				                    shadowColor: 'rgba(0, 0, 0, 0.5)'
+				                }
+				            }
+				        }
+				    ]
+				};
+			if (option2 && typeof option2 === "object") {
+				myChart2.setOption(option2, true);
+			}
+			//收入
+			var dom3 = document.getElementById("payInMoney");
+			var myChart3 = echarts.init(dom3);
+			var app = {};
+			
+			var allPayInData = [[${everyMonthPayInMoneyList}]];
+			option3 = null;
+			option3 = {
+				xAxis : {
+					type : 'category',
+					data : months
+				},
+				yAxis : {
+					type : 'value'
+				},
+				series : [ {
+					data : allPayInData,
+					type : 'bar',
+			        itemStyle: {
+			            color: '#009688'
+			        },
+			        label: {
+			            show: true,
+			        },
+	
+			        emphasis: {
+			            label: {
+			                show: true,
+			            }
+			        }
+				} ]
+			};
+			;
+			if (option3 && typeof option3 === "object") {
+				myChart3.setOption(option3, true);
+			}
+			//收入分类占比
+			var inTypeCatalog = [[${inTypeCatalog}]];
+			var payInMapByCatalog = [[${payInMapByCatalog}]];
+			var pInMap = [];
+			for(var key in payInMapByCatalog){
+				pInMap.push({value:payInMapByCatalog[key], name:key});
+			}
+			var dom4 = document.getElementById("payInCatalog");
+			var myChart4 = echarts.init(dom4);
+			option4 = {
+				    title : {
+				        text: '收入分类占比',
+				        x:'center'
+				    },
+				    tooltip : {
+				        trigger: 'item',
+				        formatter: "{a} <br/>{b} : {c} ({d}%)"
+				    },
+				    legend: {
+				        orient: 'vertical',
+				        left: 'left',
+				        data:  inTypeCatalog
+				    },
+				    series : [
+				        {
+				            name: '支出占比',
+				            type: 'pie',
+				            radius : '55%',
+				            center: ['50%', '60%'],
+				            data: pInMap,
+				            itemStyle: {
+				                emphasis: {
+				                    shadowBlur: 10,
+				                    shadowOffsetX: 0,
+				                    shadowColor: 'rgba(0, 0, 0, 0.5)'
+				                }
+				            }
+				        }
+				    ]
+				};
+			if (option4 && typeof option4 === "object") {
+				myChart4.setOption(option4, true);
+			}
+		});
+	</script>
+</html>

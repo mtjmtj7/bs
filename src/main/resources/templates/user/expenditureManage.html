@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>支出管理</title>
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <link rel="stylesheet" href="/css/layui.css"  media="all">
+   <link rel="stylesheet" href="/css/tableFilter.css"  media="all">
+  <style type="text/css">
+  	.msg{
+  		color:#2F4056;
+  		font-style: italic;
+  	}
+  </style>
+</head>
+<body>
+ 
+<table class="layui-hide" id="payOut" lay-filter="tableDemo"></table>
+              
+          
+<script src="/layui.js" charset="utf-8"></script>
+<script src="/js/tableFilter.js" charset="utf-8"></script>
+<script type="text/html" id="barDemo">
+  <a class="layui-btn layui-btn-primary layui-btn-xs" lay-event="detail">查看</a>
+  <a class="layui-btn layui-btn-xs" lay-event="edit">修改</a>
+  <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+</script>
+<script type="text/html" id="toolbarDemo">
+  <div class="layui-btn-container">
+    <button class="layui-btn layui-btn-sm" lay-event="getCheck">删除选中数据</button>
+    <button class="layui-btn layui-btn-sm" lay-event="getCheck" id="rebtn"><i class="layui-icon layui-icon-refresh"></i></button>
+  </div>
+</script>
+<script th:inline="none">
+layui.use(['table','laytpl'], function(){
+	  var table = layui.table;
+	  var $ = layui.jquery;
+	  var laytpl = layui.laytpl;
+	  var tableFilter = layui.tableFilter;
+	  
+	  table.render({
+	    elem: '#payOut'
+	    ,url:'/user/payOutGet/'
+	    ,toolbar: '#toolbarDemo'
+	    ,totalRow : true
+	    ,title: '支出表'
+	    ,limit: 8
+	    ,cellMinWidth: 80
+	    ,cols: [[
+	    	{type:'checkbox'}
+	      ,{field:'outname', title: '支出名称',sort: true}
+	      ,{field:'money',  title: '金额', sort: true,width:100}
+	      ,{field:'outtypeid', title: '分类',sort: true,templet: '#outType',width:100}
+	      ,{field:'createtime', title: '创建时间', sort: true}
+	      ,{field:'updatetime', title: '修改时间', sort: true}
+	      ,{fixed: 'right',  align:'center', toolbar: '#barDemo'}
+	    ]]
+	    ,page: false
+		    ,done: function(){
+		    	$(".layui-table-page a").click(function(){
+		    		$(".layui-table-page button").click()
+		    	});
+		    }
+	  });
+	  //刷新
+	  $("#rebtn").click(function(){
+		  window.location.reload();
+	  });
+	  //表单过滤
+	  var tableFilterIns = tableFilter.render({
+		    'elem' : '#payOut',//table的选择器
+		    'mode' : 'local',//过滤模式
+		    'filters' : [
+				{field: 'outname', type:'input'},
+				{field: 'money', type:'input'},
+				{field: 'outtypeid', type:'checkbox'}
+			],//过滤项配置
+		    'done': function(filters){
+		        //结果回调
+		    }
+		})
+		
+	  //监听工具条
+	  table.on('tool(tableDemo)', function(obj){
+		    var data = obj.data;
+		    if(obj.event === 'detail'){
+		    	layer.open({
+		    		  title:'详细信息'
+		    		  ,closeBtn: 1//显示关闭按钮
+		    		  ,area: ['500px', '300px']
+		    		  ,content:'<table><tr><td>名称：</td><td><span class="msg">'+data.outname+'</span></td></tr><tr><td>金额：</td><td><span class="msg">'+data.money+'</span></td></tr><tr><td>分类：</td><td><span class="msg">'+$("#outType").text()+'</span></td></tr><tr><td>创建时间：</td><td><span class="msg">'+data.createtime+'</span></td></tr><tr><td>修改时间：</td><td><span class="msg">'+data.updatetime+'</span></td></tr><tr><td>备注：</td><td><span class="msg">'+data.remark+'</span></td></tr></table>'
+		    		});  
+		    	
+		    }
+		    else if(obj.event === 'del'){
+		      layer.confirm('确认删除?', function(index){
+		    	  $.ajax({
+			             type: "POST",
+			             url: "/user/payoutDelete",
+			             data:{
+			            	 outid:data.outid
+			             },
+			             success: function(data){
+			            	layer.msg(data);
+					    	obj.del();
+					        layer.close(index);
+			             }
+			         });
+		      });
+		    } else if(obj.event === 'edit'){
+			    layer.open({
+			        type: 2,
+			        title: '修改支出信息',
+			        shadeClose: true,
+			        shade: false,
+			        area: ['700px', '450px'],
+			        fixed: false, //不固定
+			        maxmin: true, //开启最大化最小化按钮
+			        content: '/user/updatePayOut/'+data.outid
+			      });
+		    }
+	  });
+	//工具栏事件
+	  table.on('toolbar(tableDemo)', function(obj){
+	    var checkStatus = table.checkStatus(obj.config.id);
+	    switch(obj.event){
+	      case 'getCheck':
+	        var data = checkStatus.data;
+	        var ids = "";
+	        for(var i = 0;i < data.length; i++){
+	        	ids += data[i].outid;
+	        	if(i < data.length - 1){
+	        		ids += '-';
+	        	}
+	        }
+	        if(ids.length == 0){
+	        	layer.alert("请勾选要删除的列！")
+	        }
+	        else{
+	        	$.ajax({
+		             type: "POST",
+		             url: "/user/payOutDeleteMany",
+		             data:{
+		            	 ids:ids
+		             },
+		             success: function(data){
+		            	layer.msg(data,{time:1000},function(){
+		            		location.reload();
+		            	});
+		             }
+		         });
+	        }
+	    };
+	  });
+	});
+</script>
+		<script type="text/html" id="outType">
+            <div id="outType">
+            {{# var fu = function(){
+                    var outtypeid = d.outtypeid;
+                    if(outtypeid == 1){return "饮食";}
+                    else if(outtypeid == 2){return "服饰美容";}
+                    else if(outtypeid == 3){return "生活日用";}
+                    else if(outtypeid == 4){return "住房缴费";}
+                    else if(outtypeid == 5){return "交通出行";}
+                    else if(outtypeid == 6){return "通讯物流";}
+                    else if(outtypeid == 7){return "文教娱乐";}
+                    else if(outtypeid == 8){return "运动健康";}
+                    else if(outtypeid == 9){return "理财";}
+                    else if(outtypeid == 10){return "保险";}
+                    else if(outtypeid == 11){return "人情往来";}
+                    else{return "其它";}
+                }
+            }}
+            {{fu()}}
+            </div>
+        </script>
+</body>
+</html>

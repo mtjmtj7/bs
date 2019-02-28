@@ -1,0 +1,19 @@
+<ul class="layui-nav layui-nav-tree layui-inline" lay-filter="leftList" th:fragment="leftList" style="margin-right: 10px;">
+  <li class="layui-nav-item layui-nav-itemed">
+    <a href="javascript:;">用户管理</a>
+    <dl class="layui-nav-child">
+      <dd class="layui-this"><a href="#" data-url="userManage" id="userManage" data-type="tabAdd">注册用户管理</a></dd>
+      <dd><a href="#" data-url="userSearch" id="userSearch" data-type="tabAdd">注册用户查询</a></dd>
+      <dd><a href="#" data-url="userAdd" id="userAdd" data-type="tabAdd">注册新用户</a></dd>
+    </dl>
+  </li>
+  <li class="layui-nav-item layui-nav-itemed">
+    <a href="javascript:;">分类管理</a>
+    <dl class="layui-nav-child">
+      <dd><a href="#" data-url="inCatalogManage" id="inCatalogManage" data-type="tabAdd">收入分类</a></dd>
+      <dd><a href="#" data-url="outCatalogManage" id="outCatalogManage" data-type="tabAdd">支出分类</a></dd>
+      <dd><a href="#" data-url="addCatalog" id="addCatalog" data-type="tabAdd">添加分类</a></dd>
+    </dl>	
+  </li>
+  <li class="layui-nav-item"><a href="#" data-url="userAnalysis"  id="userAnalysis" data-type="tabAdd">数据分析</a></li>
+</ul>

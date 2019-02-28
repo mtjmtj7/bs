@@ -1,0 +1,22 @@
+server:
+  port: 8081
+Spring: 
+  datasource:
+    url: jdbc:mysql://localhost:3306/bs?characterEncoding=UTF-8&serverTimezone=UTC
+    username: root
+    password: zheng123
+  jpa:
+    hibernate:
+      ddl-auto: update
+      naming: 
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+    show-sql: true
+#文件上传
+  servlet:
+    multipart:
+      max-file-size: 1MB
+      max-request-size: 5MB
+#格式化时间
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: GMT+8
